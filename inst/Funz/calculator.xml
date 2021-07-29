@@ -1,0 +1,16 @@
+<CALCULATOR>
+    <!-- localhost -->
+    <HOST name="127.0.0.1"  port="19001" />
+    <HOST name="127.0.0.1"  port="19002" />
+    <HOST name="127.0.0.1"  port="19003" />
+    <HOST name="127.0.0.1"  port="19004" />
+
+    <!-- edit and uncomment with your code
+    <CODE name="R"     command="R CMD BATCH" />
+    <CODE name="bash"     command="/bin/bash" />
+    <CODE name="cmd.exe"     command="cmd.exe /c" />
+     -->
+
+<CODE name='Python' command='./scripts/Python.sh' />
+
+</CALCULATOR>

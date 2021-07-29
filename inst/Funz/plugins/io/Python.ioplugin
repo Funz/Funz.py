@@ -1,0 +1,10 @@
+variableStartSymbol=?
+variableLimit=[...]
+formulaStartSymbol=$
+formulaLimit={...}
+commentLineChar=#
+
+
+outputlist=`grep("(.*)py","print\\(\'(.*)=")>>before("=")>>after("'")`
+
+output.???.get=lines("out.txt")>>filter("^???=(.*)")>>after("=")
