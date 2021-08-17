@@ -189,10 +189,10 @@ def CompileInput(model,input_files,input_values,output_dir="."):
     @examples
     Funz.CompileInput(model = "Python",
                  input_files = os.path.join(Funz.FUNZ_HOME,"samples","branin.py"),
-                 input_values = {'x1':0.5, 'x2':0.6))
+                 input_values = {'x1':0.5, 'x2':0.6})
     Funz.CompileInput(model = "Python",
                  input_files = os.path.join(Funz.FUNZ_HOME,"samples","branin.py"),
-                 input_values = {'x1':c(0.5,.55), b=c(0.6,.7)))
+                 input_values = {'x1':[0.5,.55], b=[0.6,.7]})
     """
     return(Funz_CompileInput(model=model,input_files=input_files,input_values=input_values,output_dir=output_dir))
 
