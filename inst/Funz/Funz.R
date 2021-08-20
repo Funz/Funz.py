@@ -351,7 +351,10 @@ Funz.init <- function(FUNZ_HOME=.dir, java.control=if (Sys.info()[['sysname']]==
 #' @return list of results from this DoE.
 #' @example Funz_Design(design = "GradientDescent", options = list(nmax=10),input.variables = list(x1="[0,1]",x2="[1,2]"), fun = function(X){abs(X$a*X$b)})
 Funz_Design <- function(fun,design,options=NULL,input.variables,fun.control=list(cache=FALSE,vectorize="fun",vectorize.by=1,foreach.options=NULL),monitor.control=list(results.tmp=TRUE),archive.dir=NULL,verbose.level=0,verbosity=verbose.level,log.file=TRUE,...) {
-    .Funz.Last.design <<- list(design=design,options=options,fun=fun,input.variables=input.variables,fun.control=list(cache=fun.control$cache,vectorize=fun.control$vectorize,vectorize.by=fun.control$vectorize.by,foreach.options=fun.control$foreach.options),monitor.control=list(results.tmp=monitor.control$results.tmp),archive.dir=archive.dir,verbosity=verbosity,log.file=log.file,optargs=list(...))
+    .Funz.Last.design <<- list(design=design,options=options,fun=fun,
+                               input.variables=input.variables,
+                               fun.control=fun.control,monitor.control=monitor.control,
+                               archive.dir=archive.dir,verbosity=verbosity,log.file=log.file,optargs=list(...))
 
     if (is.null(design))
         stop(paste("Design 'design' must be specified.\n Available: ",.Funz.Designs))
@@ -628,7 +631,10 @@ Funz_Design.info <- function(design, input.variables) {
 #' @return list of array results from the code, arrays size being equal to input.variables arrays size.
 #' @example Funz_Run(model = "R", input.files = file.path(FUNZ_HOME,"samples","branin.R"),input.variables = list(x1=runif(10), b=runif(10)), output.expressions = "z")
 Funz_Run <- function(model=NULL,input.files,input.variables=NULL,all.combinations=FALSE,output.expressions=NULL,run.control=list(force.retry=2,cache.dir=NULL),archive.dir=NULL,verbose.level=0,verbosity=verbose.level,log.file=TRUE,monitor.control=list(sleep=5,display.fun=NULL)) {
-    .Funz.Last.run <<- list(model=model,input.files=input.files,input.variables=input.variables,output.expressions=output.expressions,archive.dir=archive.dir,run.control=list(force.retry=run.control$force.retry,cache.dir=run.control$cache.dir),verbosity=verbosity,log.file=log.file,monitor.control=list(sleep=monitor.control$sleep,display.fun=monitor.control$display.fun))
+    .Funz.Last.run <<- list(model=model,input.files=input.files,
+                            input.variables=input.variables,output.expressions=output.expressions,
+                            run.control=run.control,monitor.control=monitor.control,
+                            archive.dir=archive.dir,verbosity=verbosity,log.file=log.file)
 
     if (exists(".Funz.Models"))
         if (!is.null(model) && (!is.element(el=model,set=.Funz.Models)))
@@ -835,7 +841,7 @@ Funz_Run.info <- function(model=NULL,input.files=NULL) {
 #' Convenience overview of Funz grid status.
 #' @return String list of all visible Funz daemons running on the network.
 Funz_GridStatus <- function() {
-    utils::read.delim(textConnection(gsub("\t","",.jclassPrint$gridStatusInformation())),sep="|")[,2:9]
+    utils::read.delim(textConnection(gsub("\t","",.jclassPrint$gridStatusInformation())),sep="|")[,2:10]
 }
 
 
@@ -924,7 +930,11 @@ Funz_ReadOutput <- function(model, input.files, output.dir) {
 #' @example Funz_RunDesign(model="R", input.files=file.path(FUNZ_HOME,"samples","branin.R"), output.expressions="cat", design = "GradientDescent", design.options = list(nmax=5),input.variables = list(x1="[0,1]",x2="[0,1]"))
 #' @example Funz_RunDesign(model="R", input.files=file.path(FUNZ_HOME,"samples","branin.R"), output.expressions="cat", design = "GradientDescent", design.options = list(nmax=5),input.variables = list(x1="[0,1]",x2=c(0,1)))
 Funz_RunDesign <- function(model=NULL,input.files,design=NULL,design.options=NULL,input.variables=NULL,output.expressions=NULL,run.control=list(force.retry=2,cache.dir=NULL),monitor.control=list(results.tmp=TRUE,sleep=5,display.fun=NULL),archive.dir=NULL,verbosity=0,log.file=TRUE) {
-    .Funz.Last.rundesign <<- list(model=model,input.files=input.files,output.expressions=output.expressions,design=design,input.variables=input.variables,design.options=design.options,run.control=list(force.retry=run.control$force.retry,cache.dir=run.control$cache.dir),verbosity=verbosity,log.file=log.file,monitor.control=monitor.control,run.control=run.control,archive.dir=archive.dir)
+    .Funz.Last.rundesign <<- list(model=model,input.files=input.files,
+                                  design=design,design.options=design.options,
+                                  input.variables=input.variables,output.expressions=output.expressions,
+                                  monitor.control=monitor.control,run.control=run.control,
+                                  archive.dir=archive.dir,verbosity=verbosity,log.file=log.file)
 
     if (exists(".Funz.Models"))
         if (!is.null(model) && (!is.element(el=model,set=.Funz.Models)))

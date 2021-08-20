@@ -811,7 +811,7 @@ def Funz_Run_info(model=None,input_files=None):
 ## Convenience overview of Funz grid status.
 # @return String list of all visible Funz daemons running on the network.
 def Funz_GridStatus():
-    comps = [l.split('|')[2:9] for l in _jclassPrint.gridStatusInformation().replace("\t","").split("\n")]
+    comps = [l.split('|')[2:10] for l in _jclassPrint.gridStatusInformation().replace("\t","").split("\n")]
     l = {}
     for t in range(0,len(comps[0])):
         l[comps[0][t].strip()] = [c[t].strip() for c in comps[1:len(comps)-1]]
@@ -952,7 +952,7 @@ def Funz_RunDesign(model=None,input_files=None,output_expressions=None,design=No
              state = shell.getState()
 
              if bool(re.search('Failed!',state)):
-                 raise Exception("Run failed:\n"+ _jclassFormat.ArrayMapToMDString(runshell.getResultsArrayMap()))
+                 raise Exception("Run failed:\n"+ _jclassFormat.ArrayMapToMDString(shell.getResultsArrayMap()))
 
              finished = (bool(re.search('Over.',state)) | bool(re.search('Failed!',state)) | bool(re.search('Exception!!',state)))
 
@@ -1047,7 +1047,7 @@ def Funz_RunDesign_start(model,input_files,output_expressions=None,design=None,i
                     pass
                 if verbosity>0: print(" ok.")
 
-    shell = J.org.funz.api.Shell_v1(model,JArrayinput_files,output_expressions, design, JMapinput_variables, joptions)
+    shell = J.org.funz.api.Shell_v1(model,JArrayinput_files,_gateway.new_array(J.java.lang.String,0), design, JMapinput_variables, joptions)
     shell.setVerbosity(verbosity)
     _Funz_Last_rundesign['shell'] = shell
     #try: shell.trap("INT")) # to not allow ctrl-c to stop whole JVM, just this runshell
@@ -1058,7 +1058,7 @@ def Funz_RunDesign_start(model,input_files,output_expressions=None,design=None,i
         if verbosity>0:
             print("Using default output expressions: ", end='')
             print(_JArrayToPArray(output_expressions))
-        shell.setOutputExpressions(_JArray(output_expressions,"java.lang.String"))
+    shell.setOutputExpressions(_JArray(output_expressions,"java.lang.String"))
     _Funz_Last_rundesign['output_expressions'] = output_expressions
     
     # If no output dir is provided, use current one
