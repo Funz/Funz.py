@@ -35,7 +35,7 @@ Funz.installDesign("GradientDescent") # required for later example
 
 ## Usage: Funz from Python console
 
-Once installed, Funz library allows to access almost all features of Funz through command line.
+Once installed, Funz Python module allows to access almost all features of Funz through command line.
 
 #### Starting calculations back-end
 
@@ -56,12 +56,12 @@ Funz.Grid()
 
 ### Parametric modelling
 
-This main feature of Funz allows to evaluate a parametric model, built from parametrized files (like following ' branin.py' file including variables starting with a reserved character '?'):
+This main feature of Funz allows to evaluate a parametric model, built from parameterized files (like following ' branin.py' file including variables starting with a reserved character '?'):
 ```{python echo=F, comment=''}
 with open(os.path.join(Funz.FUNZ_HOME,"samples","branin.py"), 'r') as f:
     print(f.read())
 ```
-___Note: usually, a parametric model is based on heavy simulation software, not callable easily like a function. In practice, this example with an Python function may be easier to evaluate directly, of course.___
+___Note: usually, a parametric model is based on heavy simulation software, not callable easily like a function. In practice, this example with a Python function may be easier to evaluate directly, of course.___
 
 Once calculators (eg. started from back-end) are available, you can launch this parametric model for given variables (x1 and x2) values:
 ```{python results=F}
