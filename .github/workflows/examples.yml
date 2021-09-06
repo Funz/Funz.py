@@ -1,0 +1,38 @@
+name: Examples
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ '*.*' ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  examples:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        Python: [3.6, 3.7, 3.8]
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 11
+        java-package: jdk
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.Python }}       
+    - run: pip install git+https://github.com/Funz/Funz.py > install.out
+      shell: bash
+    - run: python -c "import Funz; calcs = startCalculators(5); Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > Run.out
+      shell: bash
+    - run: Rscript -e "import Funz; installDesign('GradientDescent'); Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > Design.out
+      shell: bash
+    - run: Rscript -e "import Funz; installDesign('GradientDescent'); startCalculators(5); Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'})" > RunDesign.Rout
+      shell: bash
+    - uses: actions/upload-artifact@v2
+      with:
+        path: ./*.out
