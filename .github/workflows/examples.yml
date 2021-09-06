@@ -25,7 +25,7 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.Python }}       
-    - run: pip install git+https://github.com/Funz/Funz.py > install.out
+    - run: pip install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt; pip install git+https://github.com/Funz/Funz.py > install.out
       shell: bash
     - run: python -c "import Funz; calcs = Funz.startCalculators(5); Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z'); Funz.stopCalculators(calcs)" > Run.out
       shell: bash
