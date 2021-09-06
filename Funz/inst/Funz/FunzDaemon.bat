@@ -32,7 +32,10 @@ for /F %%a in ('dir /B "%BASEDIR%mina-*.jar"') do (
 for /F %%a in ('dir /B "%BASEDIR%sigar-*.jar"') do (
   set LIB=!LIB!;%BASEDIR%%%a
 )
-for /F %%a in ('dir /B "%BASEDIR%slf4j-*.jar"') do (
+for /F %%a in ('dir /B "%BASEDIR%slf4j-api-*.jar"') do (
+  set LIB=!LIB!;%BASEDIR%%%a
+)
+for /F %%a in ('dir /B "%BASEDIR%slf4j-nop-*.jar"') do (
   set LIB=!LIB!;%BASEDIR%%%a
 )
 set LIB=!LIB!"

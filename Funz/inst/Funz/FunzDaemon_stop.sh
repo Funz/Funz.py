@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FUNZ_HOME=$HOME/.Funz
+FUNZ_HOME=${FUNZ_HOME:-$HOME/.Funz}
 
 HOSTNAME=`hostname`
 

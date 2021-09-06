@@ -9,9 +9,10 @@
 #    * using curl (win10): echo "bye"| curl -m 1 telnet://myserver:19000
 
 LISTEN_PORT="19000"
-FUNZ_HOME=`dirname $0`
+FUNZ_PATH=`dirname $0`
 CALCULATORS=10
 PORTS=( "19001" "19002" "19003" "19004" ) # May be read from message, also
+export FUNZ_HOME=/SCRATCH/PROMETHEE/HYDRO
 
 # Uncomment your NetCat version:
 #NCAT="nc -nvFl" ## OpenBSD NetCat
@@ -23,10 +24,10 @@ GET_SAY="sed 's/\(.*\)Connection from \(.*\)/\2/' | cut -d'_' -f2"
 
 
 # Stop daemons & restore calculator.xml
-cp $FUNZ_HOME/calculator.xml $FUNZ_HOME/calculator-bak.xml
+cp $FUNZ_PATH/calculator.xml $FUNZ_PATH/calculator-bak.xml
 function _stop {
-  $FUNZ_HOME/FunzDaemon_stop.sh
-  mv $FUNZ_HOME/calculator-bak.xml $FUNZ_HOME/calculator.xml
+  $FUNZ_PATH/FunzDaemon_stop.sh
+  mv $FUNZ_PATH/calculator-bak.xml $FUNZ_PATH/calculator.xml
 }
 trap _stop INT
 trap _stop TERM
@@ -44,25 +45,25 @@ while true; do
 
   # Update calculator.xml
   if [[ $say == "hi" ]]; then
-    cp $FUNZ_HOME/calculator.xml $FUNZ_HOME/calculator-tmp.xml
+    cp $FUNZ_PATH/calculator.xml $FUNZ_PATH/calculator-tmp.xml
     for p in "${PORTS[@]}"; do
-      sed -i -- "s_</CALCULATOR>_<HOST name='$ip' port='$p'/>\n</CALCULATOR>_g" $FUNZ_HOME/calculator-tmp.xml
+      sed -i -- "s_</CALCULATOR>_<HOST name='$ip' port='$p'/>\n</CALCULATOR>_g" $FUNZ_PATH/calculator-tmp.xml
     done
-    mv $FUNZ_HOME/calculator-tmp.xml $FUNZ_HOME/calculator.xml
+    mv $FUNZ_PATH/calculator-tmp.xml $FUNZ_PATH/calculator.xml
 
-    if [[ ${#funz_clients} == "0" ]]; then $FUNZ_HOME/FunzDaemon_start.sh $CALCULATORS; fi  # just added the first client, so start daemons
+    if [[ ${#funz_clients} == "0" ]]; then $FUNZ_PATH/FunzDaemon_start.sh $CALCULATORS; fi  # just added the first client, so start daemons
     funz_clients=$funz_clients","$ip
     echo "++ "$ip
   else
-    cp $FUNZ_HOME/calculator.xml $FUNZ_HOME/calculator-tmp.xml
+    cp $FUNZ_PATH/calculator.xml $FUNZ_PATH/calculator-tmp.xml
     for p in "${PORTS[@]}"; do
-      sed -i -- "s_<HOST name='$ip' port='$p'/>\$__g" $FUNZ_HOME/calculator-tmp.xml
+      sed -i -- "s_<HOST name='$ip' port='$p'/>\$__g" $FUNZ_PATH/calculator-tmp.xml
     done      
-    sed -i -- '/^$/N;/^\n$/D' $FUNZ_HOME/calculator-tmp.xml # cleanup blank lines
-    mv $FUNZ_HOME/calculator-tmp.xml $FUNZ_HOME/calculator.xml
+    sed -i -- '/^$/N;/^\n$/D' $FUNZ_PATH/calculator-tmp.xml # cleanup blank lines
+    mv $FUNZ_PATH/calculator-tmp.xml $FUNZ_PATH/calculator.xml
 
     funz_clients=$(echo "$funz_clients" | sed "s/,$ip//g")
     echo "-- "$ip
-    if [[ ${#funz_clients} == "0" ]]; then $FUNZ_HOME/FunzDaemon_stop.sh; fi # No remaining clients, so stop daemons
+    if [[ ${#funz_clients} == "0" ]]; then $FUNZ_PATH/FunzDaemon_stop.sh; fi # No remaining clients, so stop daemons
   fi
 done
