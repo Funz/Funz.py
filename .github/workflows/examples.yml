@@ -29,11 +29,11 @@ jobs:
       shell: bash
     - run: pip3 install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt; pip3 install git+https://github.com/Funz/Funz.py > install.out
       shell: bash
-    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5); Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z'); Funz.stopCalculators(calcs)" > Run.out
+    - run: python3 -c "import Funz, os, numpy; calcs = Funz.startCalculators(5); Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z'); Funz.stopCalculators(calcs)" > Run.out
       shell: bash
-    - run: python3 -c "import Funz; Funz.installDesign('GradientDescent'); Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > Design.out
+    - run: python3 -c "import Funz, os, numpy; Funz.installDesign('GradientDescent'); Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > Design.out
       shell: bash
-    - run: python3 -c "import Funz; Funz.installDesign('GradientDescent'); Funz.startCalculators(5); Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'}); Funz.stopCalculators(calcs)" > RunDesign.Rout
+    - run: python3 -c "import Funz, os, numpy; Funz.installDesign('GradientDescent'); Funz.startCalculators(5); Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'}); Funz.stopCalculators(calcs)" > RunDesign.Rout
       shell: bash
     - uses: actions/upload-artifact@v2
       with:
