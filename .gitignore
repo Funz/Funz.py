@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.png
+*.Rdata
+x1=*
+x2=*
+cases.xml
+report.md
+GradientDescent*
