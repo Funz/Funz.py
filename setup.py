@@ -16,6 +16,6 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['numpy', 'py4j', 'requests', 're', 'os', 'warnings', 'subprocess', 'sys', 'signal'],
+    install_requires=['numpy', 'py4j', 'requests', 'os', 'warnings', 'subprocess', 'sys', 'signal'],
     include_package_data=True,
  )
