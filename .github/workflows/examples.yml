@@ -39,7 +39,7 @@ jobs:
       shell: bash
     - run: python3 -c "import Funz, os, numpy; Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > ${{matrix.os}}-Python${{matrix.Python}}/Design.out
       shell: bash
-    - run: python3 -c "import Funz, os, numpy; Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'})" > ${{matrix.os}}-Python${{matrix.Python}}/RunDesign.Rout
+    - run: python3 -c "import Funz, os, numpy; Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[0,1]'})" > ${{matrix.os}}-Python${{matrix.Python}}/RunDesign.Rout
       shell: bash
 #    - run: python3 -c "import Funz; Funz.stopCalculators(calcs)" >> Calcs.out
 #      shell: bash
