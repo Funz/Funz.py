@@ -31,7 +31,7 @@ jobs:
       shell: bash 
     - run: |
         pip3 install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt; \
-        pip3 install git+https://github.com/Funz/Funz.py > install.out; \
+        pip3 install git+https://github.com/Funz/Funz.py >  {{ matrix.os }}-Python${{ matrix.Python }}/install.out; \
         python3 -c "import Funz; Funz.installDesign('GradientDescent')" >> ${{ matrix.os }}-Python${{ matrix.Python }}/install.out
       shell: bash
     - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{ matrix.os }}-Python${{ matrix.Python }}/Calcs.out
