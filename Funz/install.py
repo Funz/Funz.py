@@ -19,6 +19,8 @@ global _github_repos
 _github_repos = None
 try:
     _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+    if len(_github_repos)<=1:
+        _github_repos = None
 except:
     pass
 
@@ -46,7 +48,13 @@ def availableModels(refresh_repo = False):
     global _github_repos
     if refresh_repo or (_github_repos is None):
         _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+    if len(_github_repos)<=1:
+        _github_repos = None
 
+    if _github_repos is None:
+        warnings.warn("Failed to acces GitHub Funz repo: "+str(requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={})))
+        return(None)
+    
     l = lambda r: re.sub("plugin-","",r['name'])
     return( [l(r) for r in _github_repos  if re.subn("plugin-","",r['name'])[1]>0] )
 
@@ -213,6 +221,12 @@ def availableDesigns(refresh_repo = False):
     global _github_repos
     if refresh_repo or (_github_repos is None):
         _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+    if len(_github_repos)<=1:
+        _github_repos = None
+    
+    if _github_repos is None:
+        warnings.warn("Failed to acces GitHub Funz repo: "+str(requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={})))
+        return(None)
     
     l = lambda r: re.sub("algorithm-","",r['name'])
     return( [l(r) for r in _github_repos  if re.subn("algorithm-","",r['name'])[1]>0] )
