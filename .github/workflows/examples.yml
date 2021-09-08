@@ -33,7 +33,7 @@ jobs:
     - run: pip3 install git+https://github.com/Funz/Funz.py
     - run: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
       shell: bash
-    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out
+    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out &
       shell: bash
     - run: python3 -c "import Funz, os, numpy; Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > ${{matrix.os}}-Python${{matrix.Python}}/Run.out
       shell: bash
@@ -46,4 +46,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        path: ./${{matrix.os}}-Python${{matrix.Python}}
+        path: ./${{matrix.os}}-*
