@@ -25,24 +25,26 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.Python }}
-    - run: pip3 install --upgrade pip   
+    - run: pip3 install --upgrade pip
       shell: bash
+    - run: mkdir ${{ matrix.os }}-Python${{ matrix.Python }}
+      shell: bash 
     - run: |
         pip3 install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt; \
         pip3 install git+https://github.com/Funz/Funz.py > install.out; \
-        python3 -c "import Funz; Funz.installDesign('GradientDescent')" >> install.out
+        python3 -c "import Funz; Funz.installDesign('GradientDescent')" >> ${{ matrix.os }}-Python${{ matrix.Python }}/install.out
       shell: bash
-    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > Calcs.out
+    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{ matrix.os }}-Python${{ matrix.Python }}/Calcs.out
       shell: bash
-    - run: python3 -c "import Funz, os, numpy; Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > Run.out
+    - run: python3 -c "import Funz, os, numpy; Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > ${{ matrix.os }}-Python${{ matrix.Python }}/Run.out
       shell: bash
-    - run: python3 -c "import Funz, os, numpy; Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > Design.out
+    - run: python3 -c "import Funz, os, numpy; Funz.Design(fun=lambda X:abs(X['x1']*X['x2']),fun_control={'vectorize':'for'},design = 'GradientDescent', options = {'max_iterations':10},input_variables = {'x1':'[0,1]','x2':'[1,2]'})" > ${{ matrix.os }}-Python${{ matrix.Python }}/Design.out
       shell: bash
-    - run: python3 -c "import Funz, os, numpy; Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'})" > RunDesign.Rout
+    - run: python3 -c "import Funz, os, numpy; Funz.RunDesign(model='Python',input_files=os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),output_expressions='z', design = 'GradientDescent',design_options = {'max_iterations'=10},input_variables = {'x1':'[0,1]','x2':'[0,1]'})" > ${{ matrix.os }}-Python${{ matrix.Python }}/RunDesign.Rout
       shell: bash
 #    - run: python3 -c "import Funz; Funz.stopCalculators(calcs)" >> Calcs.out
 #      shell: bash
     - uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        path: ./*.out
+        path: ./${{ matrix.os }}-Python${{ matrix.Python }}
