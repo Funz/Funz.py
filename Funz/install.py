@@ -150,8 +150,11 @@ def setupModel(model):
               node.attrib['cplugin'] = cplugin
         list(calculator_xml.getroot()).append(node)
 
-    with open(os.path.join(FUNZ_HOME,"calculator.xml"), "wb") as f:
-        f.write(ElementTree.tostring(calculator_xml.getroot()))
+        with open(os.path.join(FUNZ_HOME,"calculator.xml"), "wb") as f:
+            f.write(ElementTree.tostring(calculator_xml.getroot()))
+        print("Funz model "+model+" added.")
+    else:
+        print("Funz model "+model+" already setup.")
 
 import tempfile, pkg_resources
 def install_githubModel(model,force=False):
