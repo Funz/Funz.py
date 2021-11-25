@@ -21,7 +21,7 @@ jobs:
     - uses: actions/setup-java@v2
       with:
         java-version: 11
-        java-package: jdk
+        distribution: openjdk
     - uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.Python}}
