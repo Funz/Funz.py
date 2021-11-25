@@ -79,16 +79,41 @@ def _JArrayToPArray(a):
             e = _JMapToPMap(e)
         pa.append(e)
     return(pa)
-    
-def _JMapToPMap(m):
+
+## full matchin of regexp. equivalent to java "String.matches()"
+# @test _jmatch("(.+)min",["x1","x2","min","argmin","z"])
+# @test _jmatch("(.*)min",["x1","x2","min","argmin","z"])
+# @test _jmatch("min",["x1","x2","min","argmin","z"])
+def _jmatch(pattern, x):
+    eq_ok = [x[int(i)] for i in range(len(x)) if x[int(i)]==pattern]
+    p = re.compile(pattern)
+    g = [p.fullmatch(xi) for xi in x]
+    return(numpy.unique(eq_ok + [x[int(i)] for i in numpy.where(g)[0]]))
+
+def _flat(S):
+    if S == []:
+        return S
+    if isinstance(S[0], list):
+        return _flat(S[0]) + _flat(S[1:])
+    return S[:1] + _flat(S[1:])
+
+# @test _jmatchs(["min","argmin"],["x1","x2","min","argmin","z"])
+# @test _jmatchs(["min","argmin","(.*)min"],["x1","x2","min","argmin","z"])
+def _jmatchs(patterns, x):
+    return(numpy.unique([i for subl in [_jmatch(p,x) for p in patterns] for i in subl]))
+        
+def _JMapToPMap(m, filter=None):
     p={}
-    for k in m.keys():
+    K = m.keys()
+    if not filter is None:
+        K = _jmatchs(filter,_JArrayToPArray(K))
+    for k in K:
         if isinstance(m[k],py4j.java_collections.JavaArray):
             p[k] = _JArrayToPArray(m[k])
         elif isinstance(m[k],py4j.java_collections.JavaList):
             p[k] = _JArrayToPArray(m[k]) #_JListToJArray(m[k]))
         elif isinstance(m[k],py4j.java_collections.JavaMap):
-            p[k] = _JMapToPMap(m[k]) #_JListToJArray(m[k]))
+            p[k] = _JMapToPMap(m[k], filter) #_JListToJArray(m[k]))
         else:
             p[k] = m[k]
             
@@ -183,10 +208,15 @@ def _jdelete(jo):
 
 
 ###################################### Init ###################################
-_dir = None
-if 'FUNZ_HOME' in globals(): _dir = FUNZ_HOME
-if _dir is None: _dir = os.getenv('FUNZ_HOME',None)
-if _dir is None: _dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+default_dir = None
+if 'FUNZ_HOME' in globals(): default_dir = FUNZ_HOME
+if default_dir is None: default_dir = os.getenv('FUNZ_HOME',None)
+if default_dir is None: default_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+default_java_control = None
+if 'java_control' in globals(): default_java_control = java_control
+if default_java_control is None: default_java_control = {'Xmx':"512m",'Xss':"256k"} if sys.platform.startswith("win") else {'Xmx':"512m"}
+
 ## Initialize Funz environment.
 # @param FUNZ_HOME set to Funz installation path.
 # @param verbosity verbosity of Funz workbench.
@@ -194,7 +224,7 @@ if _dir is None: _dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 # @param java_control list of JVM startup parameters (like -D...=...).
 # @param jvmargs optional parameters passed to 'java' call.
 # @example FUNZ_HOME="c:\Program Files\Funz";Funz_init(FUNZ_HOME)
-def Funz_init(FUNZ_HOME=_dir, java_control={'Xmx':"512m",'Xss':"256k"} if sys.platform.startswith("win") else {'Xmx':"512m"}, verbosity=0, verbose_level=None, **jvmargs) :
+def Funz_init(FUNZ_HOME=default_dir, java_control=default_java_control, verbosity=0, verbose_level=None, **jvmargs) :
     if (not verbose_level is None) & (verbosity != verbose_level) : verbosity = verbose_level
 
     if FUNZ_HOME is None:
@@ -208,13 +238,15 @@ def Funz_init(FUNZ_HOME=_dir, java_control={'Xmx':"512m",'Xss':"256k"} if sys.pl
         raise Exception("FUNZ_HOME environment variable not correctly set: FUNZ_HOME="+_FUNZ_HOME+"\nPlease setup FUNZ_HOME to your Funz installation path.\n(you can get Funz freely at https://funz.github.io/)")
 
     parameters = ["-Dapp.home="+_FUNZ_HOME,"-Duser.language=en","-Duser.country=US","-Dverbosity="+str(verbosity)] #,"-Douterr=.Funz"]
-    for p in java_control.keys():
-        if p[0]=="X":
-            parameters.append("-"+p+java_control[p])
-        else:
-            parameters.append("-D"+p+"="+java_control[p])
+    if (not (java_control is None)) & isinstance(java_control,dict):
+        for p in java_control.keys():
+            if p[0]=="X":
+                parameters.append("-"+p+java_control[p])
+            else:
+                parameters.append("-D"+p+"="+java_control[p])
     parameters.append("-Djava.awt.headless=true") # -Dnashorn.args='--no-deprecation-warning'")
-    
+    parameters.append("-Djdk.lang.processReaperUseDefaultStackSize=true") # this avoids StackOverFLowError on process reaper call, which appears when ProcessBuilder is used (in Rsession btw)
+
     classpath = [ f for f in os.listdir(os.path.join(_FUNZ_HOME,"lib")) if (os.path.isfile(os.path.join(os.path.join(_FUNZ_HOME,"lib"), f)) & ((os.path.splitext(f)[1])==".jar")) ]
     
     class SysOut(py4j.compat.Queue) :
@@ -326,16 +358,17 @@ def Funz_init(FUNZ_HOME=_dir, java_control={'Xmx':"512m",'Xss':"256k"} if sys.pl
 # @param fun_control['vectorize_by'] set the number of parallel execution. By default, set to the number of core of your computer (if known, otherwise set to 4).
 # @param monitor_control['results_tmp'] list of design results to deisplay at each batch. True means "all", None/False means "none".
 # @param archive_dir define an arbitrary output directory where results (log, images) are stored.
+# @param out_filter what output(s) to retreive in returned object.
 # @param verbosity print (lot of) information while running.
 # @param verbose_level deprecated verbosity
 # @param vargs optional parameters passed to 'fun'
 # @return list of results from this DoE.
 # @example def f(x): return(x['x1']*x['x2']) ; Funz_Design(f,design = "GradientDescent", options = {'max_iterations':10},input_variables = {'x1':"[0,1]",'x2':"[1,2]"})
-def Funz_Design(fun,design,options=None,input_variables=None,fun_control={'cache':False,'vectorize':"for",'vectorize_by':1},monitor_control={'results_tmp':True},archive_dir=None,verbosity=0,verbose_level=None,log_file=True,*vargs):
+def Funz_Design(fun,design,options=None,input_variables=None,fun_control={'cache':False,'vectorize':"for",'vectorize_by':1},monitor_control={'results_tmp':True},archive_dir=None,out_filter=None,verbosity=0,verbose_level=None,log_file=True,*vargs):
     if (not verbose_level is None) & (verbosity != verbose_level) : verbosity = verbose_level
 
     global _Funz_Last_design
-    _Funz_Last_design = {'design':design,'options':options,'fun':fun,'input_variables':input_variables,'fun_control':{'cache':fun_control.get('cache',False),'vectorize':fun_control.get('vectorize',"for"),'vectorize_by':fun_control.get('vectorize_by',1)},'monitor_control':{'results_tmp':monitor_control.get('results_tmp',True)},'archive_dir':archive_dir,'verbosity':verbosity,'log_file':log_file,'optargs':vargs}
+    _Funz_Last_design = {'design':design,'options':options,'fun':fun,'input_variables':input_variables,'fun_control':{'cache':fun_control.get('cache',False),'vectorize':fun_control.get('vectorize',"for"),'vectorize_by':fun_control.get('vectorize_by',1)},'monitor_control':{'results_tmp':monitor_control.get('results_tmp',True)},'archive_dir':archive_dir,'out_filter':out_filter,'verbosity':verbosity,'log_file':log_file,'optargs':vargs}
 
     if design is None:
         raise Exception("Design 'design' must be specified.\n Available: "+str(_Funz_Designs))
@@ -392,7 +425,7 @@ def Funz_Design(fun,design,options=None,input_variables=None,fun_control={'cache
         it = it+1;
     _Funz_done = True
 
-    return(Funz_Design_results(designshell))
+    return(Funz_Design_results(designshell, out_filter))
 
 
 ## Initialize a design of experiments through Funz environment.
@@ -518,12 +551,21 @@ def Funz_Design_next(designshell,X,fun,fun_control={'cache':False,'vectorize':"f
 
 ## Analyze a design of experiments through Funz environment.
 # @param designshell Java shell object holding the design of experiments.
+# @param out_filter what output(s) to retreive in returned object.
 # @return HTML analysis of the DoE.
-def Funz_Design_results(designshell) :
+def Funz_Design_results(designshell, out_filter) :
     if not '_Funz_Last_design' in globals(): global _Funz_Last_design
     if _Funz_Last_design is None: _Funz_Last_design = {}
         
-    results = _JMapToPMap(designshell.getLoopDesign().getResults())
+    jresults = designshell.getLoopDesign().getResults()
+    if out_filter is None:
+        out_filter = _flat([
+            _JArrayToPArray(designshell.getInputVariables()),
+            _JArrayToPArray(designshell.getOutputExpressions()),
+            "analysis",
+            _JArrayToPArray(designshell.getLoopDesign().analysisKeys())
+            ])
+    results = _JMapToPMap(jresults, out_filter)
     _Funz_Last_design['results'] = results
 
     experiments = designshell.getLoopDesign().finishedExperimentsMap()
@@ -585,18 +627,19 @@ def Funz_Design_info(design, input_variables) :
 # @param monitor_control['sleep delay'] time between two checks of results.
 # @param monitor_control['display_fun'] a function to display project cases status. Argument passed to is the data.frame of DoE state.
 # @param archive_dir define an arbitrary output directory where results (cases, csv files) are stored.
+# @param out_filter what output(s) to retreive in returned object.
 # @param verbosity print (lot of) information while running.
 # @param verbose_level deprecated verbosity
 # @return list of array results from the code, arrays size being equal to input_variables arrays size.
 # @example Funz_Run("R", os.path.join(_FUNZ_HOME,"samples","branin.R"),{'x1':numpy.random.uniform(size=10), 'x2':numpy.random.uniform(size=10)}, "cat")
-def Funz_Run(model=None, input_files=None, input_variables=None, all_combinations=False, output_expressions=None, run_control={'force_retry':2, 'cache_dir':None}, archive_dir=None, verbosity=0, verbose_level=None, log_file=True, monitor_control={'sleep':5, 'display_fun':None}):   
+def Funz_Run(model=None, input_files=None, input_variables=None, all_combinations=False, output_expressions=None, run_control={'force_retry':2, 'cache_dir':None}, archive_dir=None, out_filter=None, verbosity=0, verbose_level=None, log_file=True, monitor_control={'sleep':5, 'display_fun':None}):   
     if input_files is None: raise Exception("Input files has to be defined")
     if not isinstance(input_files, list): input_files = [input_files]
 
     if (not verbose_level is None) & (verbosity != verbose_level) : verbosity = verbose_level
 
     global _Funz_Last_run
-    _Funz_Last_run = {'model':model,'input_files':input_files,'input_variables':input_variables,'output_expressions':output_expressions,'archive_dir':archive_dir,'run_control':{'force_retry':run_control.get('force_retry',2),'cache_dir':run_control.get('cache_dir',None)},'verbosity':verbosity,'log_file':log_file,'monitor_control':{'sleep':monitor_control.get('sleep',5),'display_fun':monitor_control.get('display_fun',None)}}
+    _Funz_Last_run = {'model':model,'input_files':input_files,'input_variables':input_variables,'output_expressions':output_expressions,'archive_dir':archive_dir,'run_control':{'force_retry':run_control.get('force_retry',2),'cache_dir':run_control.get('cache_dir',None)},'out_filter':out_filter,'verbosity':verbosity,'log_file':log_file,'monitor_control':{'sleep':monitor_control.get('sleep',5),'display_fun':monitor_control.get('display_fun',None)}}
 
     if '_Funz_Models' in globals():
         if (not model is None) & (not model in _Funz_Models):
@@ -648,7 +691,7 @@ def Funz_Run(model=None, input_files=None, input_variables=None, all_combination
         #    runshell.shutdown()
         #    print(end='', " ok.\n")
 
-    results = Funz_Run_results(runshell,verbosity)
+    results = Funz_Run_results(runshell, out_filter)
 
     try: 
         runshell.shutdown() 
@@ -762,13 +805,20 @@ def Funz_Run_start(model,input_files,input_variables=None,all_combinations=False
 
 ## Parse a Java shell object to get its results.
 # @param runshell Java shell object to parse.
-# @param verbosity print (lot of) information while running.
+# @param out_filter what output(s) to retreive in returned object.
 # @return list of array design and results from the code, arrays size being equal to input_variables arrays size.
-def Funz_Run_results(runshell,verbosity):
+def Funz_Run_results(runshell, out_filter):
     if not '_Funz_Last_run' in globals(): global _Funz_Last_run
     if _Funz_Last_run is None: _Funz_Last_run = {}
     
-    results = _JMapToPMap(runshell.getResultsArrayMap())
+    jresults = runshell.getResultsArrayMap()
+    if out_filter is None:
+        out_filter = _flat([
+            _JArrayToPArray(runshell.getInputVariables()),
+            _JArrayToPArray(runshell.getOutputExpressions()),
+            "state","duration","calc"
+            ])
+    results = _JMapToPMap(jresults, out_filter)
     for io in _Funz_Last_run['output_expressions']+list(_Funz_Last_run['input_variables']):# Try to cast I/O values to R numeric
         try: 
             results[io] = numpy.float_(results[io])
@@ -901,19 +951,20 @@ def Funz_ReadOutput(model, input_files, output_dir) :
 # @param monitor_control['sleep'] delay time between two checks of results.
 # @param monitor_control['display_fun'] a function to display project cases status. Argument passed to is the data.frame of DoE state.
 # @param archive_dir define an arbitrary output directory where results (cases, csv files) are stored.
+# @param out_filter what output(s) to retreive in returned object.
 # @param verbosity print (lot of) information while running.
 # @param verbose_level deprecated verbosity
 # @return list of array design and results from the code.
 # @example Funz_RunDesign(model="R", input_files=os.path.join(FUNZ_HOME,"samples","branin.R"), output_expressions="z", design = "GradientDescent", design_options = {'max_iterations':5},input_variables = {'x1'="[0,1]",'x2'="[0,1]"})
 # @example Funz_RunDesign("R", os.path.join(FUNZ_HOME,"samples","branin.R"), "z", "GradientDescent", {'max_iterations':5}, {'x1':"[0,1]",'x2':[0,1]})
-def Funz_RunDesign(model=None,input_files=None,output_expressions=None,design=None,input_variables=None,design_options=None,run_control={'force_retry':2,'cache_dir':None},monitor_control={'results_tmp':True,'sleep':5,'display_fun':None},archive_dir=None,verbosity=0,verbose_level=None,log_file=True) :
+def Funz_RunDesign(model=None,input_files=None,output_expressions=None,design=None,input_variables=None,design_options=None,run_control={'force_retry':2,'cache_dir':None},monitor_control={'results_tmp':True,'sleep':5,'display_fun':None},archive_dir=None,out_filter=None,verbosity=0,verbose_level=None,log_file=True) :
     if input_files is None: raise Exception("Input files has to be defined")
     if not isinstance(input_files, list): input_files = [input_files]
 
     if (not verbose_level is None) & (verbosity != verbose_level) : verbosity = verbose_level
 
     global _Funz_Last_rundesign
-    _Funz_Last_rundesign = {'model':model,'input_files':input_files,'input_variables':input_variables,'output_expressions':output_expressions,'design':design,'design_options':design_options,'input_variables':input_variables,'run_control':{'force_retry':run_control.get('force_retry',2),'cache_dir':run_control.get('cache_dir',None)},'monitor_control':{'results_tmp':monitor_control.get('results_tmp',True),'sleep':monitor_control.get('sleep',5),'display_fun':monitor_control.get('display_fun',None)},'archive_dir':archive_dir,'verbosity':verbosity,'log_file':log_file}
+    _Funz_Last_rundesign = {'model':model,'input_files':input_files,'input_variables':input_variables,'output_expressions':output_expressions,'design':design,'design_options':design_options,'input_variables':input_variables,'run_control':{'force_retry':run_control.get('force_retry',2),'cache_dir':run_control.get('cache_dir',None)},'monitor_control':{'results_tmp':monitor_control.get('results_tmp',True),'sleep':monitor_control.get('sleep',5),'display_fun':monitor_control.get('display_fun',None)},'archive_dir':archive_dir,'out_filter':out_filter,'verbosity':verbosity,'log_file':log_file}
 
     if '_Funz_Models' in globals():
         if (not model is None) & (not model in _Funz_Models):
@@ -976,7 +1027,7 @@ def Funz_RunDesign(model=None,input_files=None,output_expressions=None,design=No
         #    runshell.shutdown()
         #    print(end='', " ok.\n")
 
-    results = Funz_RunDesign_results(shell,verbosity)
+    results = Funz_RunDesign_results(shell, out_filter)
 
     try: 
         shell.shutdown() 
@@ -1096,18 +1147,29 @@ def Funz_RunDesign_start(model,input_files,output_expressions=None,design=None,i
 
 ## Parse a Java shell object to get its results.
 # @param shell Java shell object to parse.
-# @param verbosity print (lot of) information while running.
+# @param out_filter what output(s) to retreive in returned object.
 # @return list of array design and results from the code.
 # @example TODO
-def Funz_RunDesign_results(shell,verbosity) :
+def Funz_RunDesign_results(shell, out_filter) :
     if not '_Funz_Last_rundesign' in globals(): global _Funz_Last_rundesign
     if _Funz_Last_rundesign is None: _Funz_Last_rundesign = {}
 
-    results = _JMapToPMap(shell.getResultsArrayMap())
+    jresults = shell.getResultsArrayMap()
+    if out_filter is None:
+        out_filter = [
+            _JArrayToPArray(shell.getInputVariables()),
+            _JArrayToPArray(shell.getOutputExpressions()),
+            "analysis"
+            ]
+        for loopDesign in shell.getLoopDesigns():
+            out_filter.append(_JArrayToPArray(loopDesign.analysisKeys()))
+        out_filter = _flat(out_filter)
+    results = _JMapToPMap(jresults, out_filter)
     for io in _JArrayToPArray(_Funz_Last_rundesign['output_expressions'])+list(_Funz_Last_rundesign['input_variables']):# Try to cast I/O values to R numeric
-        try:
-            results[io] = numpy.float_(results[io])
-        except: pass
+        if io in out_filter:
+            try:
+                results[io] = numpy.float_(results[io])
+            except: pass
     _Funz_Last_rundesign['results'] = results
 
     return(results)
