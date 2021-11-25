@@ -10,7 +10,7 @@ def Run(model=None,input_files=None,
                 output_expressions=None,
                 run_control={'force_retry':2,'cache_dir':None},
                 monitor_control={'sleep':5,'display_fun':None},
-                archive_dir=None,verbosity=1):
+                archive_dir=None,out_filter=None,verbosity=1):
     """ Call an external code wrapped through Funz.
     @param model name of the code wrapper to use. See .Funz.Models global var for a list of possible values.
     @param input_files list of files to give as input for the code.
@@ -22,6 +22,7 @@ def Run(model=None,input_files=None,
       'cache.dir' setup array of directories to search inside before real launching calculations.
     @param monitor_control list of monitor parameters: sleep (delay time between two checks of results), display.fun (function to display project cases status).
     @param archive_dir define an arbitrary output directory where results (cases, csv files) are stored.
+    @param out_filter what output(s) to retreive in returned object.
     @param verbosity 0-10, print information while running.
     @return list of array results from the code, arrays size being equal to input_variables arrays size.
     @export
@@ -55,7 +56,7 @@ def Run(model=None,input_files=None,
     return(Funz_Run(model=model,input_files=input_files,
              input_variables=input_variables,all_combinations=all_combinations,output_expressions=output_expressions,
              run_control=run_control,monitor_control=monitor_control,
-             archive_dir=archive_dir,verbosity=verbosity,log_file=False))
+             archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=False))
 
 def _Last_run():
     """ Get last Funz Run(...) call
@@ -68,7 +69,7 @@ def Design(fun, design, options=None,
                    input_variables=None,
                    fun_control={'cache':False,'vectorize':"fun",'vectorize_by':1,'foreach_options':None},
                    monitor_control={'results_tmp':True},
-                   archive_dir=None,verbosity=1,*vargs):
+                   archive_dir=None,out_filter=None,verbosity=1,*vargs):
     """ Apply a design of experiments through Funz environment on a response surface.
     @param design Design of Experiments (DoE) given by its name (for instance ""). See .Funz.Designs global var for a list of possible values.
     @param input_variables list of variables definition in a String (for instance x1="[-1,1]")
@@ -81,6 +82,7 @@ def Design(fun, design, options=None,
       'foreach_options optional parameters to pass to the foreach DoPar. Should include anything needed for 'fun' evaluation.
     @param monitor_control list of control parameters: 'results.tmp' list of design results to display at each batch. True means "all", None/False means "none".
     @param archive_dir define an arbitrary output directory where results (log, images) are stored.
+    @param out_filter what output(s) to retreive in returned object.
     @param verbosity print (lot of) information while running.
     @param ... optional parameters passed to 'fun'
     @return list of results from this DoE.
@@ -99,7 +101,7 @@ def Design(fun, design, options=None,
     return(Funz_Design(fun=fun,design=design,options=options,
                 input_variables=input_variables,
                 fun_control=fun_control,monitor_control=monitor_control,
-                archive_dir=archive_dir,verbosity=verbosity,log_file=False,*vargs))
+                archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=False,*vargs))
 
 def _Last_design():
     """ Get last Funz Design(...) call
@@ -113,7 +115,7 @@ def RunDesign(model=None,input_files=None,
                       design=None,design_options=None,
                       run_control={'force_retry':2,'cache_dir':None},
                       monitor_control={'results_tmp':True,'sleep':5,'display_fun':None},
-                      archive_dir=None,verbosity=1):
+                      archive_dir=None,out_filter=None,verbosity=1):
     """ Call an external (to R) code wrapped through Funz environment.
     @param model name of the code wrapper to use. See .Funz.Models global var for a list of possible values.
     @param input_files list of files to give as input for the code.
@@ -126,6 +128,7 @@ def RunDesign(model=None,input_files=None,
       'cache.dir' setup array of directories to search inside before real launching calculations.
     @param monitor_control list of monitor parameters: sleep (delay time between two checks of results), display.fun (function to display project cases status).
     @param archive_dir define an arbitrary output directory where results (cases, csv files) are stored.
+    @param out_filter what output(s) to retreive in returned object.
     @param verbosity 0-10, print information while running.
     @return list of array design and results from the code.
     @export
@@ -157,7 +160,7 @@ def RunDesign(model=None,input_files=None,
     return(Funz_RunDesign(model=model,input_files=input_files,output_expressions=output_expressions,
                    design=design,input_variables=input_variables,design_options=design_options,
                                run_control=run_control,monitor_control=monitor_control,
-                               archive_dir=archive_dir,verbosity=verbosity,log_file=False))
+                               archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=False))
                      
 def _Last_rundesign():
     """ Get last Funz RunDesign(...) call
