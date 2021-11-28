@@ -1,4 +1,6 @@
-@echo off
+@echo on
+
+cd %~dp0
 
 SET MAIN=org.funz.calculator.Calculator
 
