@@ -37,7 +37,7 @@ def startCalculators(n=1):
     n=int(n)
     if sys.platform.startswith("win"):
         for i in range(n):
-            p.append(subprocess.Popen([os.path.abspath(os.path.join(FUNZ_HOME,"FunzDaemon.bat")).replace('\\','/')],shell=True,
+            p.append(subprocess.Popen(["cmd","/c",'"'+os.path.abspath(os.path.join(FUNZ_HOME,"FunzDaemon.bat")).replace('\\','/')+'"'],shell=True,
             stdin=subprocess.DEVNULL, 
             stdout=subprocess.DEVNULL, 
             stderr=subprocess.DEVNULL))
