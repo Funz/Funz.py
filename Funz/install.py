@@ -35,7 +35,7 @@ def installedModels():
     @examples
     installedModels()
     """
-    return(_JArrayToPArray(_jclassFunz().getModelList()))
+    return(_JArrayToPArray(_jclassFunz.getModelList()))
 
 def availableModels(refresh_repo = False):
     """ List available models from Funz GitHub repository
@@ -59,6 +59,7 @@ def availableModels(refresh_repo = False):
     return( [l(r) for r in _github_repos  if re.subn("plugin-","",r['name'])[1]>0] )
 
 import zipfile
+from .inst.Funz.Funz import _Funz_Models
 def install_fileModel(model_zip, force=False):
     """ Install Funz model plugin from local zip file.
     @param model_zip zip file of plugin. Usually plugin-XYZ.zip
@@ -79,10 +80,7 @@ def install_fileModel(model_zip, force=False):
 
     # reload plugins in Funz env
     _jclassFunz.init()
-    global _Funz_Models
     _Funz_Models = installedModels()
-    global _Funz_Designs
-    _Funz_Designs = installedDesigns()
   
     if not (model in installedModels()):
         raise Exception("Could not install model "+model+" from "+model_zip)
@@ -100,9 +98,9 @@ def setupModel(model):
     """
     # Setup script file
     if sys.platform.startswith("win"):
-        script = os.path.join(FUNZ_HOME,"scripts",model+".bat")
+        script = '"'+os.path.join(FUNZ_HOME,"scripts",model+".bat")+'"'
     else:
-        script = os.path.join(FUNZ_HOME,"scripts",model+".sh")
+        script = '"'+os.path.join(FUNZ_HOME,"scripts",model+".sh")+'"'
     
     if not os.path.isfile(script):
         if sys.platform.startswith("win"):
@@ -211,7 +209,7 @@ def installedDesigns():
     @examples
     installedDesigns()
     """
-    return(_JArrayToPArray(_jclassFunz().getDesignList()))
+    return(_JArrayToPArray(_jclassFunz.getDesignList()))
 
 def availableDesigns(refresh_repo = False):
     """ List available designs from Funz GitHub repository
@@ -235,6 +233,7 @@ def availableDesigns(refresh_repo = False):
     return( [l(r) for r in _github_repos  if re.subn("algorithm-","",r['name'])[1]>0] )
 
 import zipfile
+from .inst.Funz.Funz import _Funz_Designs
 def install_fileDesign(design_zip, force=False):
     """ Install Funz design plugin from local zip file.
     @param design_zip zip file of algorithm. Usually algorithm-XYZ.zip
@@ -259,11 +258,8 @@ def install_fileDesign(design_zip, force=False):
     
     # reload plugins in Funz env
     _jclassFunz.init()
-    global _Funz_Models
-    _Funz_Models = installedModels()
-    global _Funz_Designs
     _Funz_Designs = installedDesigns()
-      
+
     if not (design in installedDesigns()):
         raise Exception("Could not install design "+design+" from "+design_zip)
     else:

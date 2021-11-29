@@ -2,8 +2,8 @@ import setuptools
 
 setuptools.setup(
     name='Funz',
-    version='1.13-1',
-    scripts=['Funz/client.py','Funz/calculator.py','Funz/install.py'] ,
+    version='1.14-0',
+    scripts=['Funz/client.py','Funz/calculator.py','Funz/install.py','Funz/inst/Funz/Funz.py'] ,
     author="Yann Richet",
     author_email="yann.richet@irsn.fr",
     description="Parametric Computing Environment",

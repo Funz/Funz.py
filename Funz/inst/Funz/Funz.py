@@ -263,7 +263,7 @@ def Funz_init(FUNZ_HOME=default_dir, java_control=default_java_control, verbosit
         print("  Initializing JVM ...\n    " + "\n    ".join(parameters))
         print("  Initializing Gateway ...")
         print("\n using " + ("\n using ").join(os.path.join(_FUNZ_HOME,"lib",str(j)) for j in classpath))
-    port = py4j.java_gateway.launch_gateway(classpath=(";" if sys.platform.startswith("win") else ":").join(os.path.join(_FUNZ_HOME,"lib",str(j)) for j in classpath),javaopts=parameters,redirect_stdout=SysOut(),redirect_stderr=SysErr(),die_on_exit=True)
+    port = py4j.java_gateway.launch_gateway(jarpath=fixpy4j_find_jar_path(),classpath=(";" if sys.platform.startswith("win") else ":").join(os.path.join(_FUNZ_HOME,"lib",str(j)) for j in classpath),javaopts=parameters,redirect_stdout=SysOut(),redirect_stderr=SysErr(),die_on_exit=True)
     if verbosity>3:
         print("                       ... port "+str(port))
     
@@ -345,6 +345,42 @@ def Funz_init(FUNZ_HOME=default_dir, java_control=default_java_control, verbosit
     global _Funz_Last_design
     _Funz_Last_design = None
 
+def fixpy4j_find_jar_path():
+    """Tries to find the path where the py4j jar is located.
+    """
+    paths = []
+    jar_file = "py4j{0}.jar".format(py4j.__version__)
+    maven_jar_file = "py4j-{0}.jar".format(py4j.__version__)
+    paths.append(jar_file)
+    # ant
+    paths.append(os.path.join(os.path.dirname(
+        os.path.realpath(py4j.__file__)), "../../../py4j-java/" + jar_file))
+    # maven
+    paths.append(os.path.join(
+        os.path.dirname(os.path.realpath(py4j.__file__)),
+        "../../../py4j-java/target/" + maven_jar_file))
+    paths.append(os.path.join(os.path.dirname(
+        os.path.realpath(py4j.__file__)), "../share/py4j/" + jar_file))
+    paths.append("../../../current-release/" + jar_file)
+    paths.append(os.path.join(sys.prefix, "share/py4j/" + jar_file))
+    # pip install py4j # On Ubuntu 16.04, where virtualenvepath=/usr/local
+    #   this file is here:
+    #     virtualenvpath/lib/pythonX/dist-packages/py4j/java_gateway.py
+    #   the jar file is here: virtualenvpath/share/py4j/py4j.jar
+    # pip install --user py4j # On Ubuntu 16.04, where virtualenvepath=~/.local
+    #   this file is here:
+    #     virtualenvpath/lib/pythonX/site-packages/py4j/java_gateway.py
+    #   the jar file is here: virtualenvpath/share/py4j/py4j.jar
+    paths.append(os.path.join(os.path.dirname(
+            os.path.realpath(py4j.__file__)), "../../../../share/py4j/" + jar_file))
+
+    paths.append(os.path.join(os.path.dirname(
+            os.path.realpath(py4j.__file__)), "../../../share/py4j/" + jar_file))
+
+    for path in paths:
+        if os.path.exists(path):
+            return path
+    return ""
 
 ###################################### Design ###################################
 
