@@ -15,8 +15,7 @@ jobs:
         os: [windows-latest]
         #[ubuntu-latest, windows-latest, macOS-latest]
         Python: [3.6, 3.7, 3.8]
-    runs-on: self-hosted
-    #${{matrix.os}}
+    runs-on: ${{matrix.os}}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:

@@ -41,7 +41,7 @@ def startCalculators(n=1):
             stdin=subprocess.DEVNULL, 
             stdout=subprocess.DEVNULL, 
             stderr=subprocess.DEVNULL,
-            creationflags=subprocess.DETACHED_PROCESS))
+            creationflags=subprocess.DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP, close_fds=True))
     else:
         for i in range(n):
             p.append(subprocess.Popen(os.path.join(FUNZ_HOME,"FunzDaemon.sh"), preexec_fn=os.setsid,
