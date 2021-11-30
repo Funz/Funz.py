@@ -34,7 +34,7 @@ jobs:
     - run: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
       shell: bash
     - if: matrix.os == 'windows-latest'
-      run: Start-Job -ScriptBlock { & python3 -c "import Funz; calcs = Funz.startCalculators(5)" }
+      run: Start-Job -ScriptBlock { & Start-Process python3 -ArgumentList '-c "import Funz; calcs = Funz.startCalculators(5)"' -RedirectStandardError error.txt -RedirectStandardOutput output.txt -NoNewWindow }
       shell: pwsh
     - if: matrix.os != 'windows-latest'
       run: python3 -c "import Funz; calcs = Funz.startCalculators(5)"
