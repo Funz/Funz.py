@@ -31,7 +31,9 @@ jobs:
       shell: bash
     - run: pip3 install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt
     - run: pip3 install git+https://github.com/Funz/Funz.py
-    - run: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
+    - uses: BerniWittmann/background-server-action@latest
+      with:
+        start: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
       shell: bash
     - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out
       shell: bash
