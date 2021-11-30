@@ -34,7 +34,6 @@ jobs:
     - uses: cypress-io/github-action@v2
       with:
         start: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
-      shell: bash
     - run: python3 -c "import Funz; calcs = Funz.startCalculators(5)" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out
       shell: bash
     - run: python3 -c "import Funz, os, numpy; Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > ${{matrix.os}}-Python${{matrix.Python}}/Run.out
