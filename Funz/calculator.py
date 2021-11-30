@@ -36,12 +36,14 @@ def startCalculators(n=1):
     p=[]
     n=int(n)
     if sys.platform.startswith("win"):
+        CREATE_NEW_PROCESS_GROUP = 0x00000200  # note: could get it from subprocess
+        DETACHED_PROCESS = 0x00000008  
         for i in range(n):
             p.append(subprocess.Popen([os.path.abspath(os.path.join(FUNZ_HOME,"FunzDaemon.bat"))],
             stdin=subprocess.DEVNULL, 
             stdout=subprocess.DEVNULL, 
             stderr=subprocess.DEVNULL,
-            creationflags=subprocess.DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP, close_fds=True))
+            creationflags=DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP, close_fds=True))
     else:
         for i in range(n):
             p.append(subprocess.Popen(os.path.join(FUNZ_HOME,"FunzDaemon.sh"), preexec_fn=os.setsid,
