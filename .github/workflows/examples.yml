@@ -35,7 +35,6 @@ jobs:
       shell: bash
     - if: matrix.os == 'windows-latest'
       run: cmd /c "START /b python3 -c 'import Funz; calcs = Funz.startCalculators(5)'"
-      shell: bash
     - if: matrix.os != 'windows-latest'
       run: python3 -c "import Funz; calcs = Funz.startCalculators(5)"
       shell: bash
