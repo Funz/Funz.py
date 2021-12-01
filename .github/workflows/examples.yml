@@ -36,7 +36,7 @@ jobs:
     #- if: matrix.os == 'windows-latest'
     #  run: Start-Job -ScriptBlock { Start-Process python3 -ArgumentList '-c "import Funz; calcs = Funz.startCalculators(5)"' -RedirectStandardError Calcs.err -RedirectStandardOutput Calcs.out -NoNewWindow }
     #- if: matrix.os != 'windows-latest'
-    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5, stdout='|', stderr='|'); for p in calcs: out,err=p.communicate(); print(err); print(out);" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out &
+    - run: python3 -c "import Funz; calcs = Funz.startCalculators(5, stdout='|', stderr='|'); print([p.communicate() for p in calcs]);" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out &
       shell: bash
     - run: python3 -c "import Funz, os, numpy; Funz.Run(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_variables = {'x1':numpy.arange(0,1,0.1),'x2':numpy.arange(0,1,0.1)},all_combinations=True,output_expressions = 'z')" > ${{matrix.os}}-Python${{matrix.Python}}/Run.out
       shell: bash
