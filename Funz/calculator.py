@@ -21,9 +21,11 @@ def Grid():
     """
     return(Funz_GridStatus())
 
-def startCalculators(n=1):
+def startCalculators(n=1, stdout=None,stderr=None):
     """ Start calculator instances (also named as "funz daemons")
     @param n number of calculators to start
+    @param stdout calculators output stream: None (default) or "|"
+    @param stderr calculators error stream: None (default) or "|"
     @return subprocess objects of started calculators
     @export
     @import subprocess
@@ -35,20 +37,27 @@ def startCalculators(n=1):
     """
     p=[]
     n=int(n)
+    if stdout is None:
+        stdout = subprocess.DEVNULL
+    if stdout == "|":
+        stdout = subprocess.PIPE
+    if stderr is None:
+        stderr = subprocess.DEVNULL
+    if stderr == "stdout":
+        stderr = subprocess.STDOUT
+    if stderr == "|":
+        stderr = subprocess.PIPE
     if sys.platform.startswith("win"):
         CREATE_NEW_PROCESS_GROUP = 0x00000200  # note: could get it from subprocess
         DETACHED_PROCESS = 0x00000008  
         for i in range(n):
             p.append(subprocess.Popen([os.path.abspath(os.path.join(FUNZ_HOME,"FunzDaemon.bat"))],
-            stdin=subprocess.DEVNULL, 
-            stdout=subprocess.DEVNULL, 
-            stderr=subprocess.DEVNULL,
+            cwd=FUNZ_HOME, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
             creationflags=DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP, close_fds=True))
     else:
         for i in range(n):
             p.append(subprocess.Popen(os.path.join(FUNZ_HOME,"FunzDaemon.sh"), preexec_fn=os.setsid,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL))
+            cwd=FUNZ_HOME, stdout=stdout, stderr=stderr))
     return(p)
 
 def stopCalculators(px):
