@@ -34,7 +34,7 @@ jobs:
     - run: python3 -c "import Funz; Funz.installDesign('GradientDescent')" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
       shell: bash
     - if: matrix.os == 'windows-latest'
-      run: python3 -c "import Funz, os, re; f=open(os.path.join(Funz.FUNZ_HOME,'calculator.xml'), 'r+'); text = f.read(); text = re.sub('\.sh', '\.bat', text); f.seek(0); f.write(text); f.truncate()" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
+      run: python3 -c "import Funz, os, re; f=open(os.path.join(Funz.FUNZ_HOME,'calculator.xml'), 'r+'); text = f.read(); text = re.sub('.sh', '.bat', text); f.seek(0); f.write(text); f.truncate()" > ${{matrix.os}}-Python${{matrix.Python}}/install.out
       shell: bash
     - run: python3 -c "import Funz; calcs = Funz.startCalculators(5, stdout='|', stderr='|'); print([p.communicate() for p in calcs]);" > ${{matrix.os}}-Python${{matrix.Python}}/Calcs.out &
       shell: bash
