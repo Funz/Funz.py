@@ -459,7 +459,12 @@ Funz_Design <- function(fun,design,options=NULL,input.variables,fun.control=list
     }
     .env$.Funz.done <- TRUE
 
-    return(Funz_Design.results(designshell, out.filter))
+    results = Funz_Design.results(designshell, out.filter)
+
+    try(designshell$shutdown(),silent=TRUE)
+    .jdelete(designshell)
+
+    return(results)
 }
 
 
@@ -1061,8 +1066,8 @@ Funz_RunDesign <- function(model=NULL,input.files,design=NULL,design.options=NUL
     Sys.sleep(1)
     results = Funz_RunDesign.results(shell, out.filter)
 
-    #try(shell$shutdown(),silent=TRUE)
-    #.jdelete(shell)
+    try(shell$shutdown(),silent=TRUE)
+    .jdelete(shell)
 
     return(results)
 }
