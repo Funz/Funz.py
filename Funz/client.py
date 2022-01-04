@@ -56,7 +56,7 @@ def Run(model=None,input_files=None,
     return(Funz_Run(model=model,input_files=input_files,
              input_variables=input_variables,all_combinations=all_combinations,output_expressions=output_expressions,
              run_control=run_control,monitor_control=monitor_control,
-             archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=!(archive_dir is None)))
+             archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=(not archive_dir is None)))
 
 def _Last_run():
     """ Get last Funz Run(...) call
@@ -101,7 +101,7 @@ def Design(fun, design, options=None,
     return(Funz_Design(fun=fun,design=design,options=options,
                 input_variables=input_variables,
                 fun_control=fun_control,monitor_control=monitor_control,
-                archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=!(archive_dir is None),*vargs))
+                archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=(not archive_dir is None),*vargs))
 
 def _Last_design():
     """ Get last Funz Design(...) call
@@ -160,7 +160,7 @@ def RunDesign(model=None,input_files=None,
     return(Funz_RunDesign(model=model,input_files=input_files,output_expressions=output_expressions,
                    design=design,input_variables=input_variables,design_options=design_options,
                                run_control=run_control,monitor_control=monitor_control,
-                               archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=!(archive_dir is None)))
+                               archive_dir=archive_dir,out_filter=out_filter,verbosity=verbosity,log_file=(not archive_dir is None)))
                      
 def _Last_rundesign():
     """ Get last Funz RunDesign(...) call
