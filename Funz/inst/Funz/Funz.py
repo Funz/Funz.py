@@ -85,6 +85,7 @@ def _JArrayToPArray(a):
 # @test _jmatch("(.*)min",["x1","x2","min","argmin","z"])
 # @test _jmatch("min",["x1","x2","min","argmin","z"])
 def _jmatch(pattern, x):
+    if len(pattern)==0: return(None)
     eq_ok = [x[int(i)] for i in range(len(x)) if x[int(i)]==pattern]
     p = re.compile(pattern)
     g = [p.fullmatch(xi) for xi in x]
