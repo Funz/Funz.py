@@ -9,7 +9,12 @@ FUNZ_HOME = os.path.join(
 
 from .inst.Funz.Funz import *
 # exec(open(os.path.join(FUNZ_HOME,"Funz.py")).read())
-Funz_init(FUNZ_HOME,verbosity=0)
+verb=os.getenv("FUNZ_verbosity")
+try:
+  verb=int(verb)
+except:
+  verb=0
+Funz_init(FUNZ_HOME,verbosity=verb)
 
 from .client import *
 from .client import _Last_run
