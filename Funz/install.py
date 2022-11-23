@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import re, os, requests, warnings, subprocess
+import re, os, requests, warnings, subprocess, sys
 
 from Funz import FUNZ_HOME
 from .inst.Funz.Funz import *
@@ -98,29 +98,31 @@ def setupModel(model):
     """
     # Setup script file
     if sys.platform.startswith("win"):
-        script = '"'+os.path.join(FUNZ_HOME,"scripts",model+".bat")+'"'
+        script = os.path.join(FUNZ_HOME,"scripts",model+".bat")
     else:
-        script = '"'+os.path.join(FUNZ_HOME,"scripts",model+".sh")+'"'
+        script = os.path.join(FUNZ_HOME,"scripts",model+".sh")
     
-    if not os.path.isfile(script):
-        if sys.platform.startswith("win"):
-            with open(script, "wb") as f:
-                f.write(("@echo off\n\nREM Fill this file to launch "+model+"\nREM First argument will be the main file").encode('utf8'))
-        else:
-            with open(script, "wb") as f:
-                f.write(("#!/bin/bash\n\n# Fill this file to launch "+model+"\n# First argument will be the main file").encode('utf8'))
-
+    try:
+        if not os.path.isfile(script):
+            if sys.platform.startswith("win"):
+                with open(script, "wb") as f:
+                    f.write(("@echo off\n\nREM Fill this file to launch "+model+"\nREM First argument will be the main file").encode('utf8'))
+            else:
+                with open(script, "wb") as f:
+                    f.write(("#!/bin/bash\n\n# Fill this file to launch "+model+"\n# First argument will be the main file").encode('utf8'))
+    except:
+        pass
     os.chmod(script,int(0o644))
     print("The script used to launch "+model+" is now opened in the editor.")
     if sys.platform.startswith("win"):
-        os.system("start "+script)
+        os.system("start "+'"'+script+'"')
     elif sys.platform.startswith("dar"):
-        subprocess.call(["open", script])
+        subprocess.call(["open", '"'+script+'"'])
     else:
         if not os.getenv('EDITOR') is None:
-            os.system('%s %s' % (os.getenv('EDITOR'), script))
+            os.system('%s %s' % (os.getenv('EDITOR'), '"'+script+'"'))
         else:
-            subprocess.call(["xdg-open", script])
+            subprocess.call(["xdg-open", '"'+script+'"'])
     os.chmod(script,int(0o755))
 
     # Update calculator_xml
