@@ -962,9 +962,10 @@ def Funz_CompileInput(model,input_files,input_values,output_dir=".") :
 # @param model name of the code wrapper to use. See _Funz.Models global var for a list of possible values.
 # @param input_files files given as input for the code.
 # @param output_dir directory where calculated files are.
+# @param out_filter what output(s) to retreive in returned object.
 # @return list of outputs & their value
 # @example Funz_ReadOutput("R", os.path.join(".","branin.R"), os.path.join("."))
-def Funz_ReadOutput(model, input_files, output_dir) :
+def Funz_ReadOutput(model, input_files, output_dir, output_filter=None) :
     if '_Funz_Models' in globals():
         if (not model is None) & (not model in _Funz_Models):
             raise Exception("Model "+model+" is not available in this Funz workbench ("+str(_Funz_Models)+")")
@@ -972,7 +973,7 @@ def Funz_ReadOutput(model, input_files, output_dir) :
     # Check (and wrap to Java) input files.
     JArrayinput_files = _PFileArrayToJFileArray(input_files)
 
-    return(_JMapToPMap(_jclassUtils.readOutputs("" if model is None else model,JArrayinput_files,_jclassFile(output_dir))))
+    return(_JMapToPMap(_jclassUtils.readOutputs("" if model is None else model,JArrayinput_files,_jclassFile(output_dir)),output_filter))
 
 
 ################################## Run & Design #################################

@@ -90,9 +90,10 @@ options(OutDec= ".")
 #' @test .jmatch("(.*)min",c("x1","x2","min","argmin","z"))
 #' @test .jmatch("min",c("x1","x2","min","argmin","z"))
 .jmatch = function(pattern, x) {
+    if (nchar(pattern)==0) return(character(0))
     eq_ok = (x == pattern)
     g = gregexpr(pattern,x)
-    start_ok = (g==1)
+    start_ok = (unlist(g)==1)
     len_ok = (nchar(x) == unlist(lapply(g,function(...)attr(...,"match.length"))))
     return(x[eq_ok | (start_ok & len_ok)])
 }
@@ -956,7 +957,7 @@ Funz_CompileInput <- function(model,input.files,input.values,output.dir=".") {
 #' @param out.filter what output(s) to retreive in returned object.
 #' @return list of outputs & their value
 #' @example Funz_ReadOutput(model = "R", input.files = "branin.R",output.dir=".")
-Funz_ReadOutput <- function(model, input.files, output.dir, out.filter) {
+Funz_ReadOutput <- function(model, input.files, output.dir, out.filter=NULL) {
     if (exists(".Funz.Models"))
         if (!is.null(model) && (!is.element(el=model,set=.Funz.Models())))
             stop(paste("Model",model,"is not available in this Funz workbench (",paste0(.Funz.Models(),collapse=","),")"))

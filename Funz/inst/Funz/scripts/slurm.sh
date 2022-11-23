@@ -10,6 +10,16 @@ abort() {
 trap "abort" INT
 trap "abort" TERM 
 
+SUBMIT="salloc"
+if [ $1 == "--srun" ]; then
+  SUBMIT="srun"
+  shift
+fi
+if [ $1 == "--salloc" ]; then
+  SUBMIT="salloc"
+  shift
+fi
+
 cmd=$1
 input=${@:2}
 cwd=`pwd`
@@ -25,7 +35,8 @@ if [ ! "$SBATCH_OPT_in""zz" = "zz" ] ; then
 fi
 echo "SBATCH: "$SBATCH_OPT >> log.txt
 
-salloc -J $qname $SBATCH_OPT --chdir=$cwd $cmd $input >> out.txt &
+echo "SUBMIT: "$SUBMIT >> log.txt
+$SUBMIT -J $qname $SBATCH_OPT --chdir=$cwd $cmd $input >> out.txt &
 mid=$!
 
 sleep 1
