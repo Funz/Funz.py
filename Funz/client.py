@@ -199,11 +199,12 @@ def CompileInput(model,input_files,input_values,output_dir="."):
     """
     return(Funz_CompileInput(model=model,input_files=input_files,input_values=input_values,output_dir=output_dir))
 
-def ReadOutput(model, input_files, output_dir):
+def ReadOutput(model, input_files, output_dir, out_filter=None):
     """ Convenience method to find variables & related info. in parametrized file.
     @param model name of the code wrapper to use. See .Funz.Models global var for a list of possible values.
     @param input_files files given as input for the code.
     @param output_dir directory where calculated files are.
+    @param out_filter what output(s) to retreive in returned object.
     @return list of outputs & their value
     @export
     @examples
@@ -211,4 +212,4 @@ def ReadOutput(model, input_files, output_dir):
     Funz.ReadOutput(model = "Python", input_files = "branin.py",output_dir=".")
     }
     """
-    return(Funz_ReadOutput(model=model, input_files=input_files, output_dir=output_dir))
+    return(Funz_ReadOutput(model=model, input_files=input_files, output_dir=output_dir, out_filter=out_filter))
