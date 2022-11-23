@@ -177,9 +177,9 @@ def ParseInput(model,input_files):
     @return list of variables & their possible default value
     @export
     @examples
-    """
     Funz.ParseInput(model = "Python",
                input_files = os.path.join(Funz.FUNZ_HOME,"samples","branin.py"))
+    """
     return(Funz_ParseInput(model=model,input_files=input_files))
 
 def CompileInput(model,input_files,input_values,output_dir="."):
