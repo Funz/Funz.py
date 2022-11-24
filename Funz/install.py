@@ -60,10 +60,11 @@ def availableModels(refresh_repo = False):
 
 import zipfile
 from .inst.Funz import Funz
-def install_fileModel(model_zip, force=False):
+def install_fileModel(model_zip, force=False, edit_script=False):
     """ Install Funz model plugin from local zip file.
     @param model_zip zip file of plugin. Usually plugin-XYZ.zip
     @param force if already installed, reinstall.
+    @param edit_script open installed script for customization.
     @param ... optional parameters to pass to unzip()
     @export
     """
@@ -88,12 +89,13 @@ def install_fileModel(model_zip, force=False):
         print("Installed Funz model "+model)
     
     # .. in the end, configure model script
-    setupModel(model=model)
+    setupModel(model=model, edit_script=edit_script)
 
 import xml.etree.ElementTree as ElementTree
-def setupModel(model):
+def setupModel(model, edit_script=False):
     """ Configure model calculation entry point
     @param model Name of model corresponding to given script
+    @param edit_script open installed script for customization.
     @export
     """
     # Setup script file
@@ -113,16 +115,18 @@ def setupModel(model):
     except:
         pass
     os.chmod(script,int(0o644))
-    print("The script used to launch "+model+" is now opened in the editor.")
-    if sys.platform.startswith("win"):
-        os.system("start "+'"'+script+'"')
-    elif sys.platform.startswith("dar"):
-        subprocess.call(["open", '"'+script+'"'])
-    else:
-        if not os.getenv('EDITOR') is None:
-            os.system('%s %s' % (os.getenv('EDITOR'), '"'+script+'"'))
+
+    if edit_script:
+        print("The script used to launch "+model+" is now opened in the editor.")
+        if sys.platform.startswith("win"):
+            os.system("start "+'"'+script+'"')
+        elif sys.platform.startswith("dar"):
+            subprocess.call(["open", '"'+script+'"'])
         else:
-            subprocess.call(["xdg-open", '"'+script+'"'])
+            if not os.getenv('EDITOR') is None:
+                os.system('%s %s' % (os.getenv('EDITOR'), '"'+script+'"'))
+            else:
+               subprocess.call(["xdg-open", '"'+script+'"'])
     os.chmod(script,int(0o755))
 
     # Update calculator_xml
@@ -157,10 +161,11 @@ def setupModel(model):
         print("Funz model "+model+" already setup.")
 
 import tempfile, pkg_resources
-def install_githubModel(model,force=False):
+def install_githubModel(model,force=False, edit_script=False):
     """ Install Funz model plugin from central GitHub repository.
     @param model model to install.
     @param force if already installed, reinstall.
+    @param edit_script open installed script for customization.
     @export
     @examples
     \dontrun{
@@ -179,12 +184,13 @@ def install_githubModel(model,force=False):
     
     if not z.ok: raise Exception("Could not download model "+model)
     
-    install_fileModel(model_zip=model_zip, force=force)
+    install_fileModel(model_zip=model_zip, force=force, edit_script=edit_script)
 
-def installModel(model,force=False):
+def installModel(model, force=False, edit_script=False):
     """ Install Funz model from local file or GitHub central repository
     @param model model to install.
     @param force if already installed, reinstall.
+    @param edit_script open installed script for customization.
     @export
     @examples
     \dontrun{
@@ -192,10 +198,10 @@ def installModel(model,force=False):
     }
     """
     if os.path.isfile(model):
-        install_fileModel(model_zip=model, force=force)
+        install_fileModel(model_zip=model, force=force, edit_script=edit_script)
     else:
         if model in availableModels():
-            install_githubModel(model, force=force)
+            install_githubModel(model, force=force, edit_script=edit_script)
         else:
             raise Exception("Model "+model+" is not available.")
 
