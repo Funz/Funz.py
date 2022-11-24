@@ -59,7 +59,7 @@ def availableModels(refresh_repo = False):
     return( [l(r) for r in _github_repos  if re.subn("plugin-","",r['name'])[1]>0] )
 
 import zipfile
-from .inst.Funz.Funz import _Funz_Models
+from .inst.Funz import Funz
 def install_fileModel(model_zip, force=False):
     """ Install Funz model plugin from local zip file.
     @param model_zip zip file of plugin. Usually plugin-XYZ.zip
@@ -80,7 +80,7 @@ def install_fileModel(model_zip, force=False):
 
     # reload plugins in Funz env
     _jclassFunz.init()
-    inst.Funz.Funz._Funz_Models = installedModels()
+    Funz._Funz_Models = installedModels()
   
     if not (model in installedModels()):
         raise Exception("Could not install model "+model+" from "+model_zip)
@@ -235,7 +235,7 @@ def availableDesigns(refresh_repo = False):
     return( [l(r) for r in _github_repos  if re.subn("algorithm-","",r['name'])[1]>0] )
 
 import zipfile
-from .inst.Funz.Funz import _Funz_Designs
+from .inst.Funz import Funz
 def install_fileDesign(design_zip, force=False):
     """ Install Funz design plugin from local zip file.
     @param design_zip zip file of algorithm. Usually algorithm-XYZ.zip
@@ -260,7 +260,7 @@ def install_fileDesign(design_zip, force=False):
     
     # reload plugins in Funz env
     _jclassFunz.init()
-    inst.Funz.Funz._Funz_Designs = installedDesigns()
+    Funz._Funz_Designs = installedDesigns()
 
     if not (design in installedDesigns()):
         raise Exception("Could not install design "+design+" from "+design_zip)
