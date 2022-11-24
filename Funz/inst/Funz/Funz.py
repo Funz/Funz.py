@@ -856,12 +856,15 @@ def Funz_Run_results(runshell, out_filter):
             "state","duration","calc"
             ])
     results = _JMapToPMap(jresults, out_filter)
-    ios = _Funz_Last_run['output_expressions']+list(_Funz_Last_run['input_variables'])
-    if not ios is None:
-        for io in ios:# Try to cast I/O values to R numeric
-            try: 
-                results[io] = numpy.float_(results[io])
-            except: pass
+    ios = list()
+    if _Funz_Last_run['output_expressions'] is not None:
+        ios = ios+list(_Funz_Last_run['output_expressions'])
+    if _Funz_Last_run['input_variables'] is not None:
+        ios = ios+list(_Funz_Last_run['input_variables'])
+    for io in ios:# Try to cast I/O values to R numeric
+        try: 
+            results[io] = numpy.float_(results[io])
+        except: pass
     _Funz_Last_run['results'] = results
 
     return(results)

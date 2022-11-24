@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='Funz',
-    version='1.15-4',
+    version='1.15-5',
     scripts=['Funz/client.py','Funz/calculator.py','Funz/install.py','Funz/inst/Funz/Funz.py'] ,
     author="Yann Richet",
     author_email="yann.richet@irsn.fr",
