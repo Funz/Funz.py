@@ -80,8 +80,7 @@ def install_fileModel(model_zip, force=False):
 
     # reload plugins in Funz env
     _jclassFunz.init()
-    global _Funz_Models
-    _Funz_Models = installedModels()
+    inst.Funz.Funz._Funz_Models = installedModels()
   
     if not (model in installedModels()):
         raise Exception("Could not install model "+model+" from "+model_zip)
@@ -261,8 +260,7 @@ def install_fileDesign(design_zip, force=False):
     
     # reload plugins in Funz env
     _jclassFunz.init()
-    global _Funz_Designs
-    _Funz_Designs = installedDesigns()
+    inst.Funz.Funz._Funz_Designs = installedDesigns()
 
     if not (design in installedDesigns()):
         raise Exception("Could not install design "+design+" from "+design_zip)
