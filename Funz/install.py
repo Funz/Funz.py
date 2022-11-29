@@ -18,7 +18,7 @@ def _github_release(_type,model,major,minor):
 global _github_repos
 _github_repos = None
 try:
-    _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+    _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos?per_page=100", headers={}, params={}).json()
     if len(_github_repos)<=1:
         _github_repos = None
 except:
@@ -47,7 +47,7 @@ def availableModels(refresh_repo = False):
     """
     global _github_repos
     if refresh_repo or (_github_repos is None):
-        _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+        _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos?per_page=100", headers={}, params={}).json()
     if len(_github_repos)<=1:
         _github_repos = None
 
@@ -229,7 +229,7 @@ def availableDesigns(refresh_repo = False):
     """
     global _github_repos
     if refresh_repo or (_github_repos is None):
-        _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={}).json()
+        _github_repos = requests.get(f"https://api.github.com/orgs/Funz/repos?per_page=100", headers={}, params={}).json()
     if len(_github_repos)<=1:
         _github_repos = None
     
