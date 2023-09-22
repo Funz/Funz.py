@@ -140,7 +140,7 @@ def setupModel(model, edit_script=False):
                 node.attrib['command'] = script
                 cplugin = os.path.join(FUNZ_HOME,"plugins","calc",model+".cplugin.jar")
                 if os.path.isfile(cplugin):
-                    node.attrib['cplugin'] = cplugin
+                    node.attrib['cplugin'] = "file:/"+cplugin
             list(calculator_xml.getroot())[i] = node
             break
     # Add this CODE if not yet found
@@ -151,7 +151,7 @@ def setupModel(model, edit_script=False):
         command=script)
         cplugin = os.path.join(FUNZ_HOME,"plugins","calc",model+".cplugin.jar")
         if os.path.isfile(cplugin):
-              node.attrib['cplugin'] = cplugin
+              node.attrib['cplugin'] = "file:/"+cplugin
         list(calculator_xml.getroot()).append(node)
 
         with open(os.path.join(FUNZ_HOME,"calculator.xml"), "wb") as f:
@@ -159,6 +159,18 @@ def setupModel(model, edit_script=False):
         print("Funz model "+model+" added.")
     else:
         print("Funz model "+model+" already setup.")
+
+def setupCalculator():
+    print("The calculator.xml file is now opened in the editor: "+os.path.join(FUNZ_HOME,"calculator.xml"))
+    if sys.platform.startswith("win"):
+        os.system("start "+'"'+os.path.join(FUNZ_HOME,"calculator.xml")+'"')
+    elif sys.platform.startswith("dar"):
+        subprocess.call(["open", '"'+os.path.join(FUNZ_HOME,"calculator.xml")+'"'])
+    else:
+        if not os.getenv('EDITOR') is None:
+            os.system('%s %s' % (os.getenv('EDITOR'), '"'+os.path.join(FUNZ_HOME,"calculator.xml")+'"'))
+        else:
+            subprocess.call(["xdg-open", '"'+os.path.join(FUNZ_HOME,"calculator.xml")+'"'])
 
 import tempfile, pkg_resources
 def install_githubModel(model,force=False, edit_script=False):
