@@ -22,7 +22,7 @@ jobs:
       with:
         java-version: 11
         distribution: 'adopt'
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{matrix.Python}}
     - run: pip3 install --upgrade pip
