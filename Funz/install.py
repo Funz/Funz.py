@@ -140,7 +140,7 @@ def setupModel(model, edit_script=False):
                 node.attrib['command'] = script
                 cplugin = os.path.join(FUNZ_HOME,"plugins","calc",model+".cplugin.jar")
                 if os.path.isfile(cplugin):
-                    node.attrib['cplugin'] = "file:/"+cplugin
+                    node.attrib['cplugin'] = "file://"+cplugin
             list(calculator_xml.getroot())[i] = node
             break
     # Add this CODE if not yet found
@@ -151,7 +151,7 @@ def setupModel(model, edit_script=False):
         command=script)
         cplugin = os.path.join(FUNZ_HOME,"plugins","calc",model+".cplugin.jar")
         if os.path.isfile(cplugin):
-              node.attrib['cplugin'] = "file:/"+cplugin
+              node.attrib['cplugin'] = "file://"+cplugin
         list(calculator_xml.getroot()).append(node)
 
         with open(os.path.join(FUNZ_HOME,"calculator.xml"), "wb") as f:
