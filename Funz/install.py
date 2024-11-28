@@ -172,7 +172,7 @@ def setupCalculator():
         else:
             subprocess.call(["xdg-open", '"'+os.path.join(FUNZ_HOME,"calculator.xml")+'"'])
 
-import tempfile, pkg_resources
+import tempfile#, pkg_resources
 def install_githubModel(model,force=False, edit_script=False):
     """ Install Funz model plugin from central GitHub repository.
     @param model model to install.
@@ -184,7 +184,7 @@ def install_githubModel(model,force=False, edit_script=False):
     install_githubModel('Modelica')
     }
     """
-    major = re.sub(".post(.*)","",pkg_resources.get_distribution("Funz").version)
+    major = re.sub(".post(.*)","",Funz.__version__)  #pkg_resources.get_distribution("Funz").version)
     model_zip = os.path.join(tempfile.gettempdir(),"plugin-"+model+".zip")
     for minor in range(11)[::-1]:
         print(".", end = '')
@@ -285,7 +285,7 @@ def install_fileDesign(design_zip, force=False):
     else:
         print("Installed Funz design "+design)
 
-import tempfile, pkg_resources
+import tempfile#, pkg_resources
 def install_githubDesign(design,force=False):
     """ Install Funz design plugin from central GitHub repository.
     @param design design to install.
@@ -296,7 +296,8 @@ def install_githubDesign(design,force=False):
     install_githubDesign('GradientDescent')
     }
     """
-    major = re.sub(".post(.*)","",pkg_resources.get_distribution("Funz").version)
+    major = re.sub(".post(.*)","",Funz.__version__)
+    #pkg_resources.get_distribution("Funz").version)
     design_zip = os.path.join(tempfile.gettempdir(),"algorithm-"+design+".zip")
     for minor in range(11)[::-1]:
         print(".", end = '')
