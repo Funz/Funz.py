@@ -56,7 +56,7 @@ def availableModels(refresh_repo = False):
         return(None)
     
     l = lambda r: re.sub("plugin-","",r['name'])
-    return( [l(r) for r in _github_repos  if re.subn("plugin-","",r['name'])[1]>0] )
+    return( [l(r) for r in _github_repos  if 'name' in r.keys() and re.subn("plugin-","",r['name'])[1]>0] )
 
 import zipfile
 from .inst.Funz import Funz
@@ -249,9 +249,8 @@ def availableDesigns(refresh_repo = False):
         warnings.warn("Failed to acces GitHub Funz repo: "+str(requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={})))
         return(None)
     
-    print(_github_repos)
     l = lambda r: re.sub("algorithm-","",r['name'])
-    return( [l(r) for r in _github_repos  if re.subn("algorithm-","",r['name'])[1]>0] )
+    return( [l(r) for r in _github_repos  if 'name' in r.keys() and re.subn("algorithm-","",r['name'])[1]>0] )
 
 import zipfile
 from .inst.Funz import Funz
