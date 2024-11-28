@@ -249,6 +249,7 @@ def availableDesigns(refresh_repo = False):
         warnings.warn("Failed to acces GitHub Funz repo: "+str(requests.get(f"https://api.github.com/orgs/Funz/repos", headers={}, params={})))
         return(None)
     
+    print(_github_repos)
     l = lambda r: re.sub("algorithm-","",r['name'])
     return( [l(r) for r in _github_repos  if re.subn("algorithm-","",r['name'])[1]>0] )
 
