@@ -959,7 +959,7 @@ def Funz_CompileInput(model,input_files,input_values,output_dir=".") :
         #JMapinput_values.put(key, str(input_values[key]).replace("[","{").replace("]","}")) # because funz waits for the array of values between{}
 
     output_dir = os.path.realpath(output_dir)
-
+    print(JMapinput_values)
     return(_jclassUtils.compileVariables("" if model is None else model,JArrayinput_files,JMapinput_values,_jclassFile(output_dir)))
 
 
