@@ -947,7 +947,7 @@ def Funz_CompileInput(model,input_files,input_values,output_dir=".") :
     JMapinput_values = _jclassLinkedHashMap()
     for key in input_values.keys():
         vals = input_values[key]
-        if isinstance(vals,numpy.array): # convert to standard python arrays
+        if isinstance(vals,numpy.ndarray): # convert to standard python arrays
             vals = vals.tolist()
         if isinstance(vals,list):
             if len(vals)>0:
