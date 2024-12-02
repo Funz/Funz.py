@@ -950,19 +950,16 @@ def Funz_CompileInput(model,input_files,input_values,output_dir=".") :
         if isinstance(vals,numpy.ndarray): # convert to standard python arrays
             vals = vals.tolist()
         if isinstance(vals,list):
-            if len(vals)>0:
-                JMapinput_values.put(key, _JArray([str(v) for v in vals],"java.lang.String"))
+            if len(vals)==1:
+                JMapinput_values.put(key, str(vals[0]))
             else:
-                JMapinput_values.put(key, _JArray([],"java.lang.String"))
+                raise Exception("CompileInput supports only one value per variable.")
         else:
-            JMapinput_values.put(key, _JArray([str(vals)],"java.lang.String"))
+            JMapinput_values.put(key, str(vals))
         #JMapinput_values.put(key, str(input_values[key]).replace("[","{").replace("]","}")) # because funz waits for the array of values between{}
 
     output_dir = os.path.realpath(output_dir)
-    print(JMapinput_values)
-    for key in JMapinput_values.keys():
-        print(key)
-        print(JMapinput_values.get(key))
+    
     return(_jclassUtils.compileVariables("" if model is None else model,JArrayinput_files,JMapinput_values,_jclassFile(output_dir)))
 
 

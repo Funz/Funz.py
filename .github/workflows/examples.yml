@@ -31,7 +31,7 @@ jobs:
       shell: bash
     - run: pip3 install -r https://raw.githubusercontent.com/Funz/Funz.py/master/requirements.txt
     - run: pip3 install git+https://github.com/Funz/Funz.py
-    - run: python3 -c "import Funz, os, numpy; Funz.CompileInput(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_values = {'x1':numpy.arange(0,1,0.2),'x2':numpy.arange(0,1,0.2)},output_dir='${{matrix.os}}-Python${{matrix.Python}}/CompileInput')" > ${{matrix.os}}-Python${{matrix.Python}}/CompileInput.out
+    - run: python3 -c "import Funz, os, numpy; Funz.CompileInput(model = 'Python',input_files = os.path.join(Funz.FUNZ_HOME,'samples','branin.py'),input_values = {'x1':0.2,'x2':0.2},output_dir='${{matrix.os}}-Python${{matrix.Python}}/CompileInput')" > ${{matrix.os}}-Python${{matrix.Python}}/CompileInput.out
       shell: bash
     - if: matrix.os == 'windows-latest'
       run: python3 -c "import Funz, os, re; f=open(os.path.join(Funz.FUNZ_HOME,'calculator.xml'), 'r+'); text = f.read(); text = re.sub('.sh', '.bat', text); f.seek(0); f.write(text); f.truncate()" > ${{matrix.os}}-Python${{matrix.Python}}/install.out

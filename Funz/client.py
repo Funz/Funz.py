@@ -186,16 +186,13 @@ def CompileInput(model,input_files,input_values,output_dir="."):
     """ Convenience method to compile variables in parametrized file.
     @param model name of the code wrapper to use. See .Funz.Models global var for a list of possible values.
     @param input_files files to give as input for the code.
-    @param input_values list of variable values to compile.
+    @param input_values list of variables value to compile (one value per variable).
     @param output_dir directory where to put compiled files.
     @export
     @examples
     Funz.CompileInput(model = "Python",
                  input_files = os.path.join(Funz.FUNZ_HOME,"samples","branin.py"),
                  input_values = {'x1':0.5, 'x2':0.6})
-    Funz.CompileInput(model = "Python",
-                 input_files = os.path.join(Funz.FUNZ_HOME,"samples","branin.py"),
-                 input_values = {'x1':[0.5,.55], b=[0.6,.7]})
     """
     return(Funz_CompileInput(model=model,input_files=input_files,input_values=input_values,output_dir=output_dir))
 
